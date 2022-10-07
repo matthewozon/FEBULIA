@@ -1,0 +1,10 @@
+name = "FEBULIA"
+uuid = "4733c49b-28d3-47eb-b6a7-17e0ecd11908"
+version = "0.0.0"
+
+[deps]
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[compat]
+julia = "1"
+
