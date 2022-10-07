@@ -43,10 +43,10 @@ export basis_exp_BC, basis_exp_deriv_BC
 
 
 # abstract object that describes the different objects involved in an FE problem
-include("type.jl") #MO
+include("type.jl")
 
 # basis function for the projection of the problem as well as some functions like dotf (the inner product of two functions)
-include("basis.jl") #MO
+include("basis.jl")
 
 
 ###################################################################
@@ -67,16 +67,16 @@ export intersectP, intersectR # dotf is already exported in the 1D case, no need
 export ==, !=, in, <, <=, *, +;
 
 # load the structure of space: the world is only made of rectangles!!!
-include("rectangle.jl") # MO
+include("rectangle.jl")
 
 # basis type: the pillar of the FEM (must be include after rectangle.jl because it relies on the structures defined in rectangle.jl)
-include("basis2D.jl") #MO
+include("basis2D.jl")
 
 # some discretized operators
 export laplace_operator_cylinder_angular_invariant, laplace_operator_cylinder_angular_invariant_ana
 export advection_operator_cartesian, gradient_operator_cartesian, advection_operator_cylinder_angular_invariant, gradient_operator_cylindrical_angular_invariant
-include("discrete_laplace.jl") #MO
-include("discrete_advection.jl") #MO
+include("discrete_laplace.jl")
+include("discrete_advection.jl")
 
 
 
