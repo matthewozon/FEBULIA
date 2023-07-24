@@ -153,23 +153,6 @@ function basis_quad_non_sym_BC(X::Array{Cdouble,1},BC::BoundCond1D;rev::Bool=fal
     # Hl used if the BCl is of type Dirichlet, it indicates if it is a homogeneous BC (true) or not (false)
     # Hu is identical to Hl for the upper boundary
     
-    # Hl = (BC.ul==0.0)
-    # Hu = (BC.uu==0.0)
-    # if (((BC.BCl=="Dirichlet") & Hl) & ((BC.BCu=="Dirichlet") & Hu))
-    #     # homogeneous DBC
-    #     basis_ = DBC_homogeneous_basis_quad_non_sym(X)
-    # elseif ( ( ((BC.BCl=="Dirichlet") & !Hl) | (BC.BCl=="Neumann") | (BC.BCl=="Robin") ) & ((BC.BCu=="Dirichlet") & Hu))
-    #     # lower boundary is either non homogeneous Dirichlet or another type and the upper boundary is HDBC
-    #     basis_ = DBC_non_homogeneous_lower_bound_basis_quad_non_sym(X)
-    # elseif ( ((BC.BCl=="Dirichlet") & Hl) & (((BC.BCu=="Dirichlet") & !Hu)  | (BC.BCu=="Neumann") | (BC.BCu=="Robin") ) )
-    #     # upper boundary is either non homogeneous Dirichlet or another type and the lwerer boundary is HDBC
-    #     basis_ = DBC_non_homogeneous_upper_bound_basis_quad_non_sym(X)
-    # else
-    #     # both BC are either NHDBC or of another type (or mixed)
-    #     basis_ = DBC_non_homogeneous_bounds_basis_quad_non_sym(X)
-    # end
-    # basis_
-    
     Hl = (BC.ul==0.0)
     Hu = (BC.uu==0.0)
     basis_quad_non_sym_BC(X;BCl=BC.BCl,BCu=BC.BCu,Hl=Hl,Hu=Hu,rev=rev)

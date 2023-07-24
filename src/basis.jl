@@ -45,7 +45,7 @@ function basis_BC(X::Array{Cdouble,1},BC::BoundCond1D;basis_fun::String="lin",ta
     elseif (basis_fun=="quad_non_sym")
         B = basis_quad_non_sym_BC(X,BC;rev=rev)
     elseif (basis_fun=="quad_non_sym_d")
-        B = basis_quad_non_sym_deriv_BC(X,BC)
+        B = basis_quad_non_sym_deriv_BC(X,BC;rev=rev)
     elseif (basis_fun=="exp")
         B = basis_exp_BC(X,BC;tau=tau)
     elseif (basis_fun=="exp_d")
