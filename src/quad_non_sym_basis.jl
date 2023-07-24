@@ -33,7 +33,8 @@ function basis_quad_non_sym_u(x::Cdouble,x0::Cdouble,x1::Cdouble;rev::Bool=false
         end
     else
         if ((x>=x0) & (x<=x1))
-            val = -(x-x0)*(x+x0-2.0x1)/((x1-x0)^2)
+            # val = -(x-x0)*(x+x0-2.0x1)/((x1-x0)^2)
+            val = ((x-(2x0-x1))/(x1-x0))*((x-x1)/(x0-x1))
         else
             val = 0.0
         end
