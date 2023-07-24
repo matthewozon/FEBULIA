@@ -10,19 +10,14 @@ function basis_quad_non_sym_l(x::Cdouble,x0::Cdouble,x1::Cdouble;rev::Bool=false
         end
     else
         if ((x>=x0) & (x<=x1))
-            val = ((x-x1)/(x0-x1))^2
+            val = ((x-x0)/(x0-x1))^2
         else
             val = 0.0
         end
     end
     val
 end
-# function basis_quad_non_sym_l(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble;rev::Bool=false) # clearly never used since this bug went through without even noticing
-#     idx1 = findall((x.>=x0) .& (x.<=x1))
-#     val = zeros(Cdouble,length(x))
-#     val[idx] = -(x[idx].-x0).*(x[idx].+x0.-2.0x1)./((x1-x0)^2)
-#     val
-# end
+
 function basis_quad_non_sym_u(x::Cdouble,x0::Cdouble,x1::Cdouble;rev::Bool=false) # a piecewise quadratic function on the range [x0,x1], phi(x0) = 1; phi(x1) = 0
     val = 0.0
     if !rev
@@ -33,7 +28,6 @@ function basis_quad_non_sym_u(x::Cdouble,x0::Cdouble,x1::Cdouble;rev::Bool=false
         end
     else
         if ((x>=x0) & (x<=x1))
-            # val = -(x-x0)*(x+x0-2.0x1)/((x1-x0)^2)
             val = ((x-(2x0-x1))/(x1-x0))*((x-x1)/(x0-x1))
         else
             val = 0.0
@@ -41,12 +35,6 @@ function basis_quad_non_sym_u(x::Cdouble,x0::Cdouble,x1::Cdouble;rev::Bool=false
     end
     val
 end
-# function basis_quad_non_sym_u(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble;rev::Bool=false)
-#     idx = findall((x.>=x0) .& (x.<=x1))
-#     val = zeros(length(x))
-#     val[idx] = ((x[idx].-x1)./(x0-x1)).^2
-#     val
-# end
 
 
 
@@ -69,23 +57,6 @@ function basis_quad_non_sym(x::Cdouble,x0::Cdouble,x1::Cdouble,xm::Cdouble;rev::
     end
     val
 end
-
-# function basis_quad_non_sym(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble,xm::Cdouble;rev::Bool=false)
-#     if false
-#         idx0 = findall((x.>=x0) .& (x.<xm))
-#         idx1 = findall((x.>=xm) .& (x.<x1))
-#         val = zeros(Cdouble,length(x))
-#         if !rev
-#             val[idx0] = ((x[idx0].-x0)./(xm-x0)).*((x[idx0].-x1)./(xm-x1))
-#             val[idx1] = ((x[idx1].-x1)./(xm-x1)).^2
-#         else
-#             val[idx1] = ((x[idx1].-x0)./(xm-x0)).*((x[idx1].-x1)./(xm-x1))
-#             val[idx0] = ((x[idx0].-x0)./(xm-x0)).^2
-#         end
-#         val
-#     end
-#     basis_quad_non_sym.(x,x0,x1,xm;rev=rev) # is it allowed? if yes, there is really no need for array implementation of this function
-# end
 
 
 function Basis_quad_non_sym(X::Array{Cdouble,1};rev::Bool=false) # X is a subdivision of the range [x_{min},x_{max}]
@@ -181,24 +152,24 @@ function basis_quad_non_sym_BC(X::Array{Cdouble,1},BC::BoundCond1D;rev::Bool=fal
     # BCl is the boundary condition at X[1]
     # Hl used if the BCl is of type Dirichlet, it indicates if it is a homogeneous BC (true) or not (false)
     # Hu is identical to Hl for the upper boundary
-    if false
-        Hl = (BC.ul==0.0)
-        Hu = (BC.uu==0.0)
-        if (((BC.BCl=="Dirichlet") & Hl) & ((BC.BCu=="Dirichlet") & Hu))
-            # homogeneous DBC
-            basis_ = DBC_homogeneous_basis_quad_non_sym(X)
-        elseif ( ( ((BC.BCl=="Dirichlet") & !Hl) | (BC.BCl=="Neumann") | (BC.BCl=="Robin") ) & ((BC.BCu=="Dirichlet") & Hu))
-            # lower boundary is either non homogeneous Dirichlet or another type and the upper boundary is HDBC
-            basis_ = DBC_non_homogeneous_lower_bound_basis_quad_non_sym(X)
-        elseif ( ((BC.BCl=="Dirichlet") & Hl) & (((BC.BCu=="Dirichlet") & !Hu)  | (BC.BCu=="Neumann") | (BC.BCu=="Robin") ) )
-            # upper boundary is either non homogeneous Dirichlet or another type and the lwerer boundary is HDBC
-            basis_ = DBC_non_homogeneous_upper_bound_basis_quad_non_sym(X)
-        else
-            # both BC are either NHDBC or of another type (or mixed)
-            basis_ = DBC_non_homogeneous_bounds_basis_quad_non_sym(X)
-        end
-        basis_
-    end
+    
+    # Hl = (BC.ul==0.0)
+    # Hu = (BC.uu==0.0)
+    # if (((BC.BCl=="Dirichlet") & Hl) & ((BC.BCu=="Dirichlet") & Hu))
+    #     # homogeneous DBC
+    #     basis_ = DBC_homogeneous_basis_quad_non_sym(X)
+    # elseif ( ( ((BC.BCl=="Dirichlet") & !Hl) | (BC.BCl=="Neumann") | (BC.BCl=="Robin") ) & ((BC.BCu=="Dirichlet") & Hu))
+    #     # lower boundary is either non homogeneous Dirichlet or another type and the upper boundary is HDBC
+    #     basis_ = DBC_non_homogeneous_lower_bound_basis_quad_non_sym(X)
+    # elseif ( ((BC.BCl=="Dirichlet") & Hl) & (((BC.BCu=="Dirichlet") & !Hu)  | (BC.BCu=="Neumann") | (BC.BCu=="Robin") ) )
+    #     # upper boundary is either non homogeneous Dirichlet or another type and the lwerer boundary is HDBC
+    #     basis_ = DBC_non_homogeneous_upper_bound_basis_quad_non_sym(X)
+    # else
+    #     # both BC are either NHDBC or of another type (or mixed)
+    #     basis_ = DBC_non_homogeneous_bounds_basis_quad_non_sym(X)
+    # end
+    # basis_
+    
     Hl = (BC.ul==0.0)
     Hu = (BC.uu==0.0)
     basis_quad_non_sym_BC(X;BCl=BC.BCl,BCu=BC.BCu,Hl=Hl,Hu=Hu,rev=rev)
