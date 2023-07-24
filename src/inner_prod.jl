@@ -12,7 +12,7 @@ function integrateEuler(f::Function,x0::Cdouble,x1::Cdouble,N::Int64) # use Quad
 end
 
 
-function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
+function riemann(f::Function, a::Real, b::Real, n::Int; method="right") #TODO: for basis functions and combination of basis functions, compute analytically the integral (maybe using Polynomials)
   if method == "right"
      xs = a .+ collect(0.0:n) * (b-a)/n
      # as = [meth(f, l, r) for (l,r) in zip(xs[1:end-1], xs[2:end])]
