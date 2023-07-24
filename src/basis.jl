@@ -33,7 +33,7 @@ include("exp_deriv_basis.jl") #MO
 
 
 # the generic basis generator
-function basis_BC(X::Array{Cdouble,1},BC::BoundCond1D;basis_fun::String="lin",tau::Cdouble=1.0) # prefer this one to the following if possible
+function basis_BC(X::Array{Cdouble,1},BC::BoundCond1D;basis_fun::String="lin",tau::Cdouble=1.0,rev::Bool=false) # prefer this one to the following if possible
     if (basis_fun=="lin")
         B = basis_lin_BC(X,BC)
     elseif (basis_fun=="lin_d")
@@ -43,7 +43,7 @@ function basis_BC(X::Array{Cdouble,1},BC::BoundCond1D;basis_fun::String="lin",ta
     elseif (basis_fun=="lagrange_d")
         B = basis_lagr_deriv_BC(X,BC)
     elseif (basis_fun=="quad_non_sym")
-        B = basis_quad_non_sym_BC(X,BC)
+        B = basis_quad_non_sym_BC(X,BC;rev=rev)
     elseif (basis_fun=="quad_non_sym_d")
         B = basis_quad_non_sym_deriv_BC(X,BC)
     elseif (basis_fun=="exp")
@@ -56,7 +56,7 @@ function basis_BC(X::Array{Cdouble,1},BC::BoundCond1D;basis_fun::String="lin",ta
     B
 end
 
-function basis_BC(X::Array{Cdouble,1};BCl::String="Dirichlet",BCu::String="Dirichlet",Hl::Bool=true,Hu::Bool=true,basis_fun::String="lin",tau::Cdouble=1.0)
+function basis_BC(X::Array{Cdouble,1};BCl::String="Dirichlet",BCu::String="Dirichlet",Hl::Bool=true,Hu::Bool=true,basis_fun::String="lin",tau::Cdouble=1.0,rev::Bool=false)
     ul = 0.0
     if !Hl
         ul = 1.0
@@ -66,5 +66,5 @@ function basis_BC(X::Array{Cdouble,1};BCl::String="Dirichlet",BCu::String="Diric
         uu = 1.0
     end
     BC = BoundCond1D(BCl,BCu,X[1],X[end];lowBC=ul,upBC=uu)
-    basis_BC(X,BC;basis_fun=basis_fun,tau=tau)
+    basis_BC(X,BC;basis_fun=basis_fun,tau=tau,rev=rev)
 end
