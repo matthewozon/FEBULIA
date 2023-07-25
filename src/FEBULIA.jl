@@ -44,11 +44,13 @@ export basis_exp_BC, basis_exp_deriv_BC
 
 # abstract object that describes the different objects involved in an FE problem
 include("type.jl")
+# more abstract representation of the basis function for the case polynomial-exponential (so far, all basis functions are of this form, and the numerical integration could benefit from this representation)
+include("type_PolyExp.jl") # not in use yet, but should become the default at some point
 
 # basis function for the projection of the problem as well as some functions like dotf (the inner product of two functions)
 include("basis.jl")
 
-
+#TODO: create a separate module for 2D (I don't have much use for 2D basis so far, except for the example cases)
 ###################################################################
 #       2D case: structure of the domain and linear basis         #
 ###################################################################
