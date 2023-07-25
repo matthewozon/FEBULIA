@@ -10,13 +10,13 @@ function basis_lagr_l(x::Cdouble,x0::Cdouble,x1::Cdouble) # a piecewise quadrati
     end
     val
 end
-function basis_lagr_l(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble)
-    idx1 = findall((x.>=x0) .& (x.<=x1))
-    val = zeros(Cdouble,length(x))
-    # val[idx] = ((x-x0)/(x1-x0)).^2
-    val[idx] = -(x[idx].-x0).*(x[idx].+x0.-2.0x1)./((x1-x0)^2)
-    val
-end
+# function basis_lagr_l(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble)
+#     idx1 = findall((x.>=x0) .& (x.<=x1))
+#     val = zeros(Cdouble,length(x))
+#     # val[idx] = ((x-x0)/(x1-x0)).^2
+#     val[idx] = -(x[idx].-x0).*(x[idx].+x0.-2.0x1)./((x1-x0)^2)
+#     val
+# end
 function basis_lagr_u(x::Cdouble,x0::Cdouble,x1::Cdouble) # a piecewise quadratic function on the range [x0,x1], phi(x0) = 1; phi(x1) = 0
     val = 0.0
     if ((x>=x0) & (x<=x1))
@@ -27,13 +27,13 @@ function basis_lagr_u(x::Cdouble,x0::Cdouble,x1::Cdouble) # a piecewise quadrati
     end
     val
 end
-function basis_lagr_u(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble)
-    idx = findall((x.>=x0) .& (x.<=x1))
-    val = zeros(length(x))
-    # val[idx] = ((x[idx]-x1)/(x0-x1)).^2
-    val[idx] = -(x[idx].-x1).*(x[idx].+x1.-2.0x0)./((x1-x0)^2)
-    val
-end
+# function basis_lagr_u(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble)
+#     idx = findall((x.>=x0) .& (x.<=x1))
+#     val = zeros(length(x))
+#     # val[idx] = ((x[idx]-x1)/(x0-x1)).^2
+#     val[idx] = -(x[idx].-x1).*(x[idx].+x1.-2.0x0)./((x1-x0)^2)
+#     val
+# end
 
 
 
@@ -46,12 +46,12 @@ function basis_lagr(x::Cdouble,x0::Cdouble,x1::Cdouble,xm::Cdouble) # a piecewis
     val
 end
 
-function basis_lagr(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble,xm::Cdouble)
-    idx = findall((x.>=x0) .& (x.<x1))
-    val = zeros(Cdouble,length(x))
-    val[idx] = ((x[idx].-x0)./(xm-x0)).*((x[idx].-x1)/(xm-x1))
-    val
-end
+# function basis_lagr(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble,xm::Cdouble)
+#     idx = findall((x.>=x0) .& (x.<x1))
+#     val = zeros(Cdouble,length(x))
+#     val[idx] = ((x[idx].-x0)./(xm-x0)).*((x[idx].-x1)/(xm-x1))
+#     val
+# end
 
 
 function Basis_lagrange(X::Array{Cdouble,1}) # X is a subdivision of the range [x_{min},x_{max}]
@@ -147,20 +147,24 @@ function basis_lagr_BC(X::Array{Cdouble,1},BC::BoundCond1D)
     # BCl is the boundary condition at X[1]
     # Hl used if the BCl is of type Dirichlet, it indicates if it is a homogeneous BC (true) or not (false)
     # Hu is identical to Hl for the upper boundary
+    # Hl = (BC.ul==0.0)
+    # Hu = (BC.uu==0.0)
+    # if (((BC.BCl=="Dirichlet") & Hl) & ((BC.BCu=="Dirichlet") & Hu))
+    #     # homogeneous DBC
+    #     basis_ = DBC_homogeneous_basis_lagr(X)
+    # elseif ( ( ((BC.BCl=="Dirichlet") & !Hl) | (BC.BCl=="Neumann") | (BC.BCl=="Robin") ) & ((BC.BCu=="Dirichlet") & Hu))
+    #     # lower boundary is either non homogeneous Dirichlet or another type and the upper boundary is HDBC
+    #     basis_ = DBC_non_homogeneous_lower_bound_basis_lagr(X)
+    # elseif ( ((BC.BCl=="Dirichlet") & Hl) & (((BC.BCu=="Dirichlet") & !Hu)  | (BC.BCu=="Neumann") | (BC.BCu=="Robin") ) )
+    #     # upper boundary is either non homogeneous Dirichlet or another type and the lwerer boundary is HDBC
+    #     basis_ = DBC_non_homogeneous_upper_bound_basis_lagr(X)
+    # else
+    #     # both BC are either NHDBC or of another type (or mixed)
+    #     basis_ = DBC_non_homogeneous_bounds_basis_lagr(X)
+    # end
+    # basis_
+
     Hl = (BC.ul==0.0)
     Hu = (BC.uu==0.0)
-    if (((BC.BCl=="Dirichlet") & Hl) & ((BC.BCu=="Dirichlet") & Hu))
-        # homogeneous DBC
-        basis_ = DBC_homogeneous_basis_lagr(X)
-    elseif ( ( ((BC.BCl=="Dirichlet") & !Hl) | (BC.BCl=="Neumann") | (BC.BCl=="Robin") ) & ((BC.BCu=="Dirichlet") & Hu))
-        # lower boundary is either non homogeneous Dirichlet or another type and the upper boundary is HDBC
-        basis_ = DBC_non_homogeneous_lower_bound_basis_lagr(X)
-    elseif ( ((BC.BCl=="Dirichlet") & Hl) & (((BC.BCu=="Dirichlet") & !Hu)  | (BC.BCu=="Neumann") | (BC.BCu=="Robin") ) )
-        # upper boundary is either non homogeneous Dirichlet or another type and the lwerer boundary is HDBC
-        basis_ = DBC_non_homogeneous_upper_bound_basis_lagr(X)
-    else
-        # both BC are either NHDBC or of another type (or mixed)
-        basis_ = DBC_non_homogeneous_bounds_basis_lagr(X)
-    end
-    basis_
+    basis_lagr_BC(X;BCl=BC.BCl,BCu=BC.BCu,Hl=Hl,Hu=Hu)
 end

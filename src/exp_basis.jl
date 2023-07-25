@@ -9,12 +9,12 @@ function basis_exp_l(x::Cdouble,x0::Cdouble,xm::Cdouble,tau::Cdouble) # a piecew
     end
     val
 end
-function basis_exp_l(x::Array{Cdouble,1},x0::Cdouble,xm::Cdouble,tau::Cdouble)
-    idx0 = findall((x.>=x0) .& (x.<=xm))
-    val = zeros(length(x))
-    val[idx0] = (1.0.-exp.(-tau*((x[idx0].-x0)./(xm-x0))))./(1.0-exp(-tau))
-    val
-end
+# function basis_exp_l(x::Array{Cdouble,1},x0::Cdouble,xm::Cdouble,tau::Cdouble)
+#     idx0 = findall((x.>=x0) .& (x.<=xm))
+#     val = zeros(length(x))
+#     val[idx0] = (1.0.-exp.(-tau*((x[idx0].-x0)./(xm-x0))))./(1.0-exp(-tau))
+#     val
+# end
 function basis_exp_u(x::Cdouble,xm::Cdouble,x1::Cdouble,tau::Cdouble) # a piecewise exp function on the range [x0,x1], x0<x2<x1
     val = 0.0
     if ((x>=xm) & (x<=x1))
@@ -24,12 +24,12 @@ function basis_exp_u(x::Cdouble,xm::Cdouble,x1::Cdouble,tau::Cdouble) # a piecew
     end
     val
 end
-function basis_exp_u(x::Array{Cdouble,1},xm::Cdouble,x1::Cdouble,tau::Cdouble)
-    idx1 = findall((x.>=xm) .& (x.<=x1))
-    val = zeros(length(x))
-    val[idx1] = (exp.(-tau*((x[idx1].-xm)./(x1-xm))) .- exp(-tau))/(1.0-exp(-tau))
-    val
-end
+# function basis_exp_u(x::Array{Cdouble,1},xm::Cdouble,x1::Cdouble,tau::Cdouble)
+#     idx1 = findall((x.>=xm) .& (x.<=x1))
+#     val = zeros(length(x))
+#     val[idx1] = (exp.(-tau*((x[idx1].-xm)./(x1-xm))) .- exp(-tau))/(1.0-exp(-tau))
+#     val
+# end
 
 # for homogeneous Dirichlet boundary conditions
 function basis_exp(x::Cdouble,x0::Cdouble,x1::Cdouble,xm::Cdouble,tau::Cdouble) # a piecewise exp function on the range [x0,x1], x0<xm<x1
@@ -44,14 +44,14 @@ function basis_exp(x::Cdouble,x0::Cdouble,x1::Cdouble,xm::Cdouble,tau::Cdouble) 
     val
 end
 
-function basis_exp(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble,xm::Cdouble,tau::Cdouble)
-    idx0 = findall((x.>=x0) .& (x.<xm))
-    idx1 = findall((x.>=xm) .& (x.<x1))
-    val = zeros(length(x))
-    val[idx0] = (1.0.-exp(-tau*((x[idx0].-x0)./(xm-x0))))./(1.0-exp(-tau))
-    val[idx1] = (exp.(-tau*((x[idx0].-xm)./(x1-xm))) .- exp(-tau))/(1.0-exp(-tau))
-    val
-end
+# function basis_exp(x::Array{Cdouble,1},x0::Cdouble,x1::Cdouble,xm::Cdouble,tau::Cdouble)
+#     idx0 = findall((x.>=x0) .& (x.<xm))
+#     idx1 = findall((x.>=xm) .& (x.<x1))
+#     val = zeros(length(x))
+#     val[idx0] = (1.0.-exp(-tau*((x[idx0].-x0)./(xm-x0))))./(1.0-exp(-tau))
+#     val[idx1] = (exp.(-tau*((x[idx0].-xm)./(x1-xm))) .- exp(-tau))/(1.0-exp(-tau))
+#     val
+# end
 
 function Basis_exp(X::Array{Cdouble,1},tau::Cdouble) # X is a subdivision of the range [x_{min},x_{max}]
     # the array must contain at least 3 values so that there is at least one function in the basis
@@ -67,19 +67,19 @@ function Basis_exp(X::Array{Cdouble,1},tau::Cdouble) # X is a subdivision of the
     Fbasis
 end
 
-function Basis_exp_(X::Array{Cdouble,1},tau::Cdouble) # X is a subdivision of the range [x_{min},x_{max}]
-    # the array must contain at least 3 values so that there is at least one function in the basis
-    if (length(X)<3)
-        throw("For the FEM with a exp basis, there must be at least 3 points so that one piecewise exp function forms the basis.")
-    end
-    N = length(X)-2
-    Fbasis = Array{Function,1}(undef,N)
-    for n in 1:N
-        # Fbasis[n] = function expb(x::Array{Cdouble,1}) basis_exp(x,X[n],X[n+2],X[n+1]) end
-        Fbasis[n] = (x::Array{Cdouble,1}->basis_exp(x,X[n],X[n+2],X[n+1],tau))
-    end
-    Fbasis
-end
+# function Basis_exp_(X::Array{Cdouble,1},tau::Cdouble) # X is a subdivision of the range [x_{min},x_{max}]
+#     # the array must contain at least 3 values so that there is at least one function in the basis
+#     if (length(X)<3)
+#         throw("For the FEM with a exp basis, there must be at least 3 points so that one piecewise exp function forms the basis.")
+#     end
+#     N = length(X)-2
+#     Fbasis = Array{Function,1}(undef,N)
+#     for n in 1:N
+#         # Fbasis[n] = function expb(x::Array{Cdouble,1}) basis_exp(x,X[n],X[n+2],X[n+1]) end
+#         Fbasis[n] = (x::Array{Cdouble,1}->basis_exp(x,X[n],X[n+2],X[n+1],tau))
+#     end
+#     Fbasis
+# end
 
 
 
@@ -152,20 +152,24 @@ function basis_exp_BC(X::Array{Cdouble,1},BC::BoundCond1D;tau::Cdouble=1.0)
     # BCl is the boundary condition at X[1]
     # Hl used if the BCl is of type Dirichlet, it indicates if it is a homogeneous BC (true) or not (false)
     # Hu is identical to Hl for the upper boundary
+    # Hl = (BC.ul==0.0)
+    # Hu = (BC.uu==0.0)
+    # if (((BC.BCl=="Dirichlet") & Hl) & ((BC.BCu=="Dirichlet") & Hu))
+    #     # homogeneous DBC
+    #     basis_ = DBC_homogeneous_basis_exp(X,tau)
+    # elseif ( ( ((BC.BCl=="Dirichlet") & !Hl) | (BC.BCl=="Neumann") | (BC.BCl=="Robin") ) & ((BC.BCu=="Dirichlet") & Hu))
+    #     # lower boundary is either non homogeneous Dirichlet or another type and the upper boundary is HDBC
+    #     basis_ = DBC_non_homogeneous_lower_bound_basis_exp(X,tau)
+    # elseif ( ((BC.BCl=="Dirichlet") & Hl) & (((BC.BCu=="Dirichlet") & !Hu)  | (BC.BCu=="Neumann") | (BC.BCu=="Robin") ) )
+    #     # upper boundary is either non homogeneous Dirichlet or another type and the lwerer boundary is HDBC
+    #     basis_ = DBC_non_homogeneous_upper_bound_basis_exp(X,tau)
+    # else
+    #     # both BC are either NHDBC or of another type (or mixed)
+    #     basis_ = DBC_non_homogeneous_bounds_basis_exp(X,tau)
+    # end
+    # basis_
+
     Hl = (BC.ul==0.0)
     Hu = (BC.uu==0.0)
-    if (((BC.BCl=="Dirichlet") & Hl) & ((BC.BCu=="Dirichlet") & Hu))
-        # homogeneous DBC
-        basis_ = DBC_homogeneous_basis_exp(X,tau)
-    elseif ( ( ((BC.BCl=="Dirichlet") & !Hl) | (BC.BCl=="Neumann") | (BC.BCl=="Robin") ) & ((BC.BCu=="Dirichlet") & Hu))
-        # lower boundary is either non homogeneous Dirichlet or another type and the upper boundary is HDBC
-        basis_ = DBC_non_homogeneous_lower_bound_basis_exp(X,tau)
-    elseif ( ((BC.BCl=="Dirichlet") & Hl) & (((BC.BCu=="Dirichlet") & !Hu)  | (BC.BCu=="Neumann") | (BC.BCu=="Robin") ) )
-        # upper boundary is either non homogeneous Dirichlet or another type and the lwerer boundary is HDBC
-        basis_ = DBC_non_homogeneous_upper_bound_basis_exp(X,tau)
-    else
-        # both BC are either NHDBC or of another type (or mixed)
-        basis_ = DBC_non_homogeneous_bounds_basis_exp(X,tau)
-    end
-    basis_
+    basis_exp_BC(X;BCl=BC.BCl,BCu=BC.BCu,Hl=Hl,Hu=Hu,tau=tau)
 end
