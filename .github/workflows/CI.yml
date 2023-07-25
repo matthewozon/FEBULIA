@@ -25,4 +25,4 @@ jobs:
           - x64
     steps:
         - uses: actions/checkout@v3
-        - run: julia -e 'using Pkg; println(readdir()); Pkg.add(url="https://github.com/matthewozon/NMOpt"); Pkg.add(url="https://github.com/matthewozon/FEBULIA"); Pkg.develop(path="./packages/AeroMecDisc.jl/"); Pkg.build("AeroMecDisc"); Pkg.test("AeroMecDisc"; coverage=true)'
+        - run: julia -e 'using Pkg; println(readdir()); Pkg.develop(path="./"); Pkg.build("FEBULIA"); Pkg.test("FEBULIA"; coverage=true)'
