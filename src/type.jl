@@ -25,6 +25,7 @@ mutable struct basis
     x::Array{Cdouble,2}  # an real array containing the interval limits of the basis functions, x[:,1] the lower limit and x[:,2] the upper one
     v::Array{Function,1} # an array of basis function
 
+
     # default ctor (it is not really meaningful)
     function basis() #
         new(0,Array{Cdouble,2}(undef,0,0),Array{Function,1}(undef,0))
@@ -37,12 +38,9 @@ mutable struct basis
 
     # cptor
     function basis(ws::basis) #
-        new(copy(ws.N),copy(ws.x),copy(ws.v))
+        new(ws.N,ws.x,ws.v)
     end
 end
-
-
-
 
 
 
@@ -80,7 +78,7 @@ mutable struct BoundCond1D
 
     #cptor
     function BoundCond1D(ws::BoundCond1D)
-        new(copy(ws.BCl),copy(ws.BCu),copy(ws.xl),copy(ws.xu),copy(ws.ul),copy(ws.uu),copy(ws.a),copy(ws.b),copy(ws.g))
+        new(ws.BCl,ws.BCu,ws.xl,ws.xu,ws.ul,ws.uu,ws.a,ws.b,ws.g)
     end
 end
 
@@ -111,7 +109,7 @@ mutable struct FEM_1D
 
     # cptor
     function FEM_1D(ws::FEM_1D)
-        new(copy(ws.a),copy(ws.l),copy(ws.B),copy(ws.Bd),copy(ws.BC))
+        new(ws.a,ws.l,ws.B,ws.Bd,ws.BC)
     end
 end
 
