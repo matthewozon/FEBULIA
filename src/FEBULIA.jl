@@ -66,7 +66,7 @@ export intersectP, intersectR # dotf is already exported in the 1D case, no need
 
 # overloaded operators
 # export ==, .==, !=, .!=, in, <, .<, <=, .<=, *, .*, +;
-export ==, !=, in, <, <=, *, +;
+export ==, in, <, <=, *, +; # != is defined as !(==) and should not be overloaded
 
 # load the structure of space: the world is only made of rectangles!!!
 include("rectangle.jl")
