@@ -19,6 +19,28 @@ mutable struct PolyExp
     end
 end
 
+function ==(p::PolyExp,q::PolyExp)
+    ((p.n==q.n) & (p.c .== q.c) & (p.α==q.α))
+end
+Base.broadcast(::typeof(==), p1::PolyExp, p2::PolyExp) = ==(p1,p2)
+
+# function +(p1::PolyExp,p2::PolyExp)
+#     PolyExp()
+# end
+# Base.broadcast(::typeof(+), p1::PolyExp, p2::PolyExp) = +(p1,p2)
+
+function *(p1::PolyExp,p2::PolyExp)
+    N = p1.n+p2.n
+    α = p1.α+p2.α
+    c = zeros(Cdouble,N+1)
+    for p in 0:N
+        [c[N+1-p] = c[N+1-p] + p1.c[p1.n+1-k]*p2.c[p2.n+1+k-p] for k in max(0,p-p2.n):min(p1.n,p)]
+    end
+    PolyExp(N,c,α)
+end
+Base.broadcast(::typeof(*), p1::PolyExp, p2::PolyExp) = *(p1,p2)
+
+
 function PolyExpBasisFun(x::Cdouble,xmin::Cdouble,xmed::Cdouble,xmax::Cdouble,PE1::PolyExp,PE2::PolyExp)
     val = 0.0
     if ((x>=xmin) & (x<xmax))
