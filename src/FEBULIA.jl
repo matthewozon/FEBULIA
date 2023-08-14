@@ -44,8 +44,6 @@ export basis_exp_BC, basis_exp_deriv_BC
 
 # abstract object that describes the different objects involved in an FE problem
 include("type.jl")
-# more abstract representation of the basis function for the case polynomial-exponential (so far, all basis functions are of this form, and the numerical integration could benefit from this representation)
-include("type_PolyExp.jl") # not in use yet, but should become the default at some point
 
 # basis function for the projection of the problem as well as some functions like dotf (the inner product of two functions)
 include("basis.jl")
@@ -56,7 +54,7 @@ include("basis.jl")
 ###################################################################
 # operator that will be overloaded
 # import Base: ==, .==, !=, .!=, in, <, .<, <=, .<=, *, .*, +; # may need to import some of these operators
-import Base: ==, !=, in, <, <=, *, +; # what about isapprox (≈)
+import Base: ==, in, <, <=, *, +; # what about isapprox (≈) !=,
 
 # the types
 export Point2D, Rectangle, rectangleMesh2D, basis2D;
@@ -81,5 +79,9 @@ include("discrete_laplace.jl")
 include("discrete_advection.jl")
 
 
+# more abstract representation of the basis function for the case polynomial-exponential (so far, all basis functions are of this form, and the numerical integration could benefit from this representation)
+include("type_PolyExp.jl") # not in use yet, but should become the default at some point
+export PolyExp, shift_PolyExp, evalPolyExp, PolyExpBasisFun, deriv, polynomial_primitive, polynomial_deriv, integrate
+export Basis_PE_h, Basis_PE_u, Basis_PE_l, basis_PE_BC, basis_PE
 
 end # module
