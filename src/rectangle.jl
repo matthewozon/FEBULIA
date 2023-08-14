@@ -28,11 +28,11 @@ end
 function ==(p::Point2D,q::Point2D)
     ((p.r==q.r) & (p.z==q.z))
 end
-function !=(p::Point2D,q::Point2D)
-    ((p.r!=q.r) | (p.z!=q.z))
-end
+# function !=(p::Point2D,q::Point2D)
+#     ((p.r!=q.r) | (p.z!=q.z))
+# end
 Base.broadcast(::typeof(==), p1::Point2D, p2::Point2D) = ==(p1,p2)
-Base.broadcast(::typeof(!=), p1::Point2D, p2::Point2D) = !=(p1,p2)
+# Base.broadcast(::typeof(!=), p1::Point2D, p2::Point2D) = !=(p1,p2)
 
 function <(p1::Point2D,p2::Point2D)
     (p1.z>p2.z) | ((p1.z==p2.z) & (p1.r<p2.r))
@@ -110,11 +110,11 @@ end
 function ==(R1::Rectangle,R2::Rectangle)
     ((R1.pul==R2.pul) & (R1.plr==R2.plr))
 end
-function !=(R1::Rectangle,R2::Rectangle)
-    ((R1.pul!=R2.pul) | (R1.plr!=R2.plr))
-end
+# function !=(R1::Rectangle,R2::Rectangle)
+#     ((R1.pul!=R2.pul) | (R1.plr!=R2.plr))
+# end
 Base.broadcast(::typeof(==), R1::Rectangle, R2::Rectangle) = ==(R1,R2)
-Base.broadcast(::typeof(!=), R1::Rectangle, R2::Rectangle) = !=(R1,R2)
+# Base.broadcast(::typeof(!=), R1::Rectangle, R2::Rectangle) = !=(R1,R2)
 
 # this operator returns true if the point belong to the area defined by the rectangle
 function in(p::Point2D,R::Rectangle)
