@@ -185,25 +185,30 @@ mutable struct basis_PE # more abstract representation of the basis for polynomi
 
     # the functions
     N::Int64             # the number of elements in the basis
-    x::Array{Cdouble,2}  # an real array containing the interval limits of the basis functions
+    # x::Array{Cdouble,2}  # an real array containing the interval limits of the basis functions
+    # use xl, xm, xu: three 1D arrays that represent the limits of the intervals of validity of the Polynomials
+    # p1 over [xl,xm), and p2 over [xm,xu]
+    xl::Array{Cdouble,1}
+    xm::Array{Cdouble,1}
+    xu::Array{Cdouble,1}
     p1::Array{PolyExp,1} # polynomial-exponential function representation (first interval)
     p2::Array{PolyExp,1} # polynomial-exponential function representation (second interval)
     v::Array{Function,1} # an array of basis function
 
     # default ctor (it is not really meaningful)
     function basis_PE() #
-        new(0,Array{Cdouble,1}(undef,0),Array{PolyExp,1}(undef,0),Array{PolyExp,1}(undef,0),Array{Function,1}(undef,0))
+        new(0,Array{Cdouble,1}(undef,0),Array{Cdouble,1}(undef,0),Array{Cdouble,1}(undef,0),Array{PolyExp,1}(undef,0),Array{PolyExp,1}(undef,0),Array{Function,1}(undef,0))
     end
 
     # ctor #TODO: boundary conditions homogeneous or not, and what type (?)
-    function basis_PE(x_::Array{Cdouble,2},p1_::Array{PolyExp,1},p2_::Array{PolyExp,1},v_::Array{Function,1})
+    function basis_PE(xl_::Array{Cdouble,1},xm_::Array{Cdouble,1},xu_::Array{Cdouble,1},p1_::Array{PolyExp,1},p2_::Array{PolyExp,1},v_::Array{Function,1})
         N_ = length(v_); # should check length of the PolyExp array and interval array too #TODO: later
-        new(N_,x_,p1_,p2_,v_)
+        new(N_,xl_,xm_,xu_,p1_,p2_,v_)
     end
 
     # cptor
     function basis_PE(ws::basis_PE)
-        new(ws.N,ws.x,ws.p1,ws.p2,ws.v)
+        new(ws.N,ws.xl,ws.xm,ws.xu,ws.p1,ws.p2,ws.v)
     end
 end
 
@@ -211,9 +216,12 @@ end
 function DBC_homogeneous_basis_PE(X::Array{Cdouble,1},p1::PolyExp,p2::PolyExp)
     Fbasis,p1Basis,p2Basis = Basis_PE_h(X,p1,p2)
     # build an array of intervals
-    Xlim = [X[1:end-2] X[3:end]]
+    # Xlim = [X[1:end-2] X[3:end]]
+    Xl = X[1:end-2]
+    Xm = X[2:end-1]
+    Xu = X[3:end]
     # create the basis
-    basis_PE(Xlim,p1Basis,p2Basis,Fbasis)
+    basis_PE(Xl,Xm,Xu,p1Basis,p2Basis,Fbasis)
 end
 
 # create a basis that of functions that vanish at the upper boundary but not the lower one
@@ -224,9 +232,12 @@ function DBC_non_homogeneous_lower_bound_basis_PE(X::Array{Cdouble,1},p1::PolyEx
     p1Basis = [p1Shift_u; p1Basis_h]
     p2Basis = [p2Shift_u; p2Basis_h]
     # build an array of intervals
-    Xlim = [X[1] X[2]; X[1:end-2] X[3:end]]
+    # Xlim = [X[1] X[2]; X[1:end-2] X[3:end]]
+    Xl = [X[1]; X[1:end-2]]
+    Xm = [X[1]; X[2:end-1]]
+    Xu = [X[2]; X[3:end]]
     # create the basis
-    basis_PE(Xlim,p1Basis,p2Basis,Fbasis)
+    basis_PE(Xl,Xm,Xu,p1Basis,p2Basis,Fbasis)
 end
 
 # create a basis that of functions that vanish at the lower boundary but not the upper one
@@ -237,9 +248,12 @@ function DBC_non_homogeneous_upper_bound_basis_PE(X::Array{Cdouble,1},p1::PolyEx
     p1Basis = [p1Basis_h; p1Shift_l]
     p2Basis = [p2Basis_h; p2Shift_l]
     # build an array of intervals
-    Xlim = [X[1:end-2] X[3:end]; X[end-1] X[end]]
+    # Xlim = [X[1:end-2] X[3:end]; X[end-1] X[end]]
+    Xl = [X[1:end-2]; X[end-1]]
+    Xm = [X[2:end-1]; X[end]]
+    Xu = [X[3:end];   X[end]]
     # create the basis
-    basis_PE(Xlim,p1Basis,p2Basis,Fbasis)
+    basis_PE(Xl,Xm,Xu,p1Basis,p2Basis,Fbasis)
 end
 
 # create a basis that of functions that do not vanish at the boundaries
@@ -251,9 +265,12 @@ function DBC_non_homogeneous_bounds_basis_PE(X::Array{Cdouble,1},p1::PolyExp,p2:
     p1Basis = [p1Shift_u; p1Basis_h; p1Shift_l]
     p2Basis = [p2Shift_u; p2Basis_h; p2Shift_l]
     # build an array of intervals
-    Xlim = [X[1] X[2]; X[1:end-2] X[3:end]; X[end-1] X[end]]
+    # Xlim = [X[1] X[2]; X[1:end-2] X[3:end]; X[end-1] X[end]]
+    Xl = [X[1]; X[1:end-2]; X[end-1]]
+    Xm = [X[1]; X[2:end-1]; X[end]]
+    Xu = [X[2]; X[3:end];   X[end]]
     # create the basis
-    basis_PE(Xlim,p1Basis,p2Basis,Fbasis)
+    basis_PE(Xl,Xm,Xu,p1Basis,p2Basis,Fbasis)
 end
 
 # get inspired from other functions to create the basis
@@ -282,3 +299,15 @@ function basis_PE_BC(X::Array{Cdouble,1},p1::PolyExp,p2::PolyExp,BC::BoundCond1D
 end
 
 
+
+function deriv(BPE::basis_PE)
+    # derive exponential-polynomials
+    p1_deriv = [deriv(BPE.p1[i]) for i in 1:BPE.N]
+    p2_deriv = [deriv(BPE.p2[i]) for i in 1:BPE.N]
+    # create functions
+    # v_deriv::Array{Function,1}
+    v_deriv = Array{Function,1}(undef,BPE.N)
+    [v_deriv[n] = (x::Cdouble->PolyExpBasisFun(x,BPE.xl[n],BPE.xm[n],BPE.xu[n],p1_deriv[n],p2_deriv[n])) for n in 1:BPE.N]
+    # pack everything in a new basis 
+    basis_PE(BPE.xl,BPE.xm,BPE.xu,p1_deriv,p2_deriv,v_deriv)
+end
