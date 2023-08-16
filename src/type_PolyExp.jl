@@ -20,7 +20,7 @@ mutable struct PolyExp
 end
 
 function ==(p::PolyExp,q::PolyExp)
-    ((p.n==q.n) & (p.c .== q.c) & (p.α==q.α))
+    ((p.n==q.n) & (all(p.c .== q.c)) & (p.α==q.α))
 end
 Base.broadcast(::typeof(==), p1::PolyExp, p2::PolyExp) = ==(p1,p2)
 

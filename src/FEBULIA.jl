@@ -79,8 +79,12 @@ include("discrete_laplace.jl")
 include("discrete_advection.jl")
 
 
+# not in use yet, but should become the default at some point
+######################################
+##   exponential polynomial basis   ##
+######################################
 # more abstract representation of the basis function for the case polynomial-exponential (so far, all basis functions are of this form, and the numerical integration could benefit from this representation)
-include("type_PolyExp.jl") # not in use yet, but should become the default at some point
+include("type_PolyExp.jl") 
 export PolyExp, shift_PolyExp, evalPolyExp, PolyExpBasisFun, deriv, polynomial_primitive, polynomial_deriv, integrate
 export Basis_PE_h, Basis_PE_u, Basis_PE_l, basis_PE_BC, basis_PE
 

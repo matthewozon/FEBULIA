@@ -2,7 +2,9 @@ using Test
 using FEBULIA
 
 
-# export basis, BoundCond1D, FEM_1D
+######################################
+##            type.jl               ##
+######################################
 
 function test_basis()
     xmin = 0.0
@@ -68,11 +70,14 @@ end
     @test test_BoundCond1D()
 end
 
+######################################
+##          inner_prod.jl           ##
+######################################
 function test_riemann()
     # riemann
     b = 1.0
     a = 0.0
-    n = 1000
+    n = 100
     f = (x::Cdouble->1.0)
     quad_right     = riemann(f, a, b, n; method="right")
     quad_left      = riemann(f, a, b, n; method="left")
@@ -80,7 +85,23 @@ function test_riemann()
     quad_simpsons  = riemann(f, a, b, n; method="simpsons")
     
     # results (quadrature approximate well enough the value of the integral)
-    (isapprox(quad_right,b-a,atol=(b-a)/n)) & (isapprox(quad_left,b-a,atol=(b-a)/n)) & (isapprox(quad_trapezoid,b-a,atol=(b-a)/n)) & (isapprox(quad_simpsons,b-a,atol=(b-a)/n))
+    cond1 = (isapprox(quad_right,b-a,atol=(b-a)/n)) & (isapprox(quad_left,b-a,atol=(b-a)/n)) & (isapprox(quad_trapezoid,b-a,atol=(b-a)/n)) & (isapprox(quad_simpsons,b-a,atol=(b-a)/n))
+
+    
+    # precomputed arrays 
+    xs = collect(LinRange(a,b,n))
+    fs = f.(xs)
+    quad_right     = riemann(fs,xs; method="right")
+    quad_left      = riemann(fs,xs; method="left")
+    quad_trapezoid = riemann(fs,xs; method="trapezoid")
+    quad_simpsons  = riemann(fs,xs; method="simpsons")
+
+    # results (quadrature approximate well enough the value of the integral)
+    cond2 = (isapprox(quad_right,b-a,atol=(b-a)/n)) & (isapprox(quad_left,b-a,atol=(b-a)/n)) & (isapprox(quad_trapezoid,b-a,atol=(b-a)/n)) & (isapprox(quad_simpsons,b-a,atol=(b-a)/n))
+
+
+    # return
+    cond1 & cond2
 end
 
 function test_dotf()
@@ -91,9 +112,17 @@ function test_dotf()
     f = (x::Cdouble->sin(x))
     g = (x::Cdouble->cos(x))
     val_dotf = dotf(f,g,xmin,xmax;N=n)
+    cond1 = (isapprox(val_dotf,0.0,atol=(xmax-xmin)/n))
+
+    # other way to numerically compute the dot product 
+    xs = collect(LinRange(xmin,xmax,n))
+    fs = sin.(xs)
+    gs = cos.(xs)
+    val_dotf = dotf(fs,gs,xs)
+    cond2 = (isapprox(val_dotf,0.0,atol=(xmax-xmin)/n))
 
     # results
-    (isapprox(val_dotf,0.0,atol=(xmax-xmin)/n))
+    cond1 & cond2 
 end
 
 function test_coefficient()
@@ -127,11 +156,25 @@ end
 function test_compute_norm()
     xmin = 0.0
     xmax = 1.0π
+    # compute norm of sin 
     norm_sin = compute_norm((x::Cdouble->sin(x)),xmin,xmax)
-    # compute_norm
-    isapprox(norm_sin,sqrt(π/2.0),atol=(xmax-xmin)/10000)
+    cond1 = isapprox(norm_sin,sqrt(π/2.0),atol=(xmax-xmin)/10000)
+
+    # other way to numerically compute the norm
+    xs = collect(LinRange(xmin,xmax,10000))
+    fs = sin.(xs)
+    norm_sin = compute_norm(fs,xs)
+    cond2 = isapprox(norm_sin,sqrt(π/2.0),atol=(xmax-xmin)/10000)
+
+    # return 
+    cond1 & cond2
 end
 
+
+
+######################################
+##      the rest of basis.jl        ##
+######################################
 
 function test_lin_BC()
     # basis_lin_BC, basis_lin_deriv_BC
@@ -305,4 +348,188 @@ end
     @test test_quadratic_non_symmetric_BC()
     @test test_exp_BC()
     @test test_basis_BC()
+end
+
+
+
+######################################
+##        type_PolyExp.jl           ##
+######################################
+
+# remains to be tested (?): shift_PolyExp, evalPolyExp, PolyExpBasisFun, Basis_PE_h, Basis_PE_u, Basis_PE_l, 
+
+function test_PolyExp()
+    p1 = PolyExp(2,[1.0;1.0;1.0],0.7);
+    cond1 = (p1.n==2)
+    cond2 = (all(p1.c.==[1.0;1.0;1.0]))
+    cond3 = (p1.α==0.7)
+
+    p2 = PolyExp(p1);
+    cond4 = (p2.n==2)
+    cond5 = (all(p2.c.==[1.0;1.0;1.0]))
+    cond6 = (p2.α==0.7)
+
+    p3 = PolyExp()
+    cond7 = (p3.n==0)
+    cond8 = (length(p3.c)==0)
+    cond9 = (p3.α==0.0)
+
+    # results
+    cond1 & cond2 & cond3 & cond4 & cond5 & cond6 & cond7 & cond8 & cond9  
+end
+
+function test_operator_overload()
+    # comparison
+    p1 = PolyExp(2,[1.0;1.0;1.0],0.7);
+    p2 = PolyExp(2,[1.0;1.0;1.0],0.7);
+    cond1 = (p1==p2)
+
+    # product 
+    p3 = p1*p2
+    cond2 = (p3.n==(p1.n+p2.n))
+    cond3 = all((p3.c .== [1.0, 2.0, 3.0, 2.0, 1.0]))
+    cond4 = (p3.α==(p1.α+p2.α))
+
+    # return
+    cond1 & cond2 & cond3 & cond4
+end
+
+
+function test_deriv()
+    p4 = PolyExp(2,[1.0;1.0;1.0],0.7);
+    p4_d = deriv(p4)
+    
+    cond1 = (p4_d.n == p4.n)
+    cond2 = (p4_d.α == p4.α)
+    cond3 = (all(p4_d.c .== ([0.7; 0.7; 0.7] + [0.0; 2.0; 1.0])))
+
+    cond1 & cond2 & cond3 
+end
+
+function test_polynomial_deriv()
+    p4 = PolyExp(2,[1.0;1.0;1.0],0.7);
+    p4_pd = polynomial_deriv(p4)
+
+    cond1 = (p4_pd.n==(p4.n-1))
+    cond2 = (p4_pd.α==0.0)
+    cond3 = (all(p4_pd.c .== [2.0; 1.0]))
+
+    cond1 & cond2 & cond3 
+end
+
+function test_polynomial_primitive()
+    p4 = PolyExp(2,[1.0;1.0;1.0],0.7);
+    p4_pp = polynomial_primitive(p4)
+
+    cond1 = (p4_pp.n==(p4.n+1))
+    cond2 = (p4_pp.α==0.0)
+    cond3 = (all(p4_pp.c .== [1/3; 1/2; 1.0; 0.0]))
+
+    cond1 & cond2 & cond3 
+end
+
+
+function test_integrate()
+    p5 = PolyExp(0,[1.0],0.0)
+    cond1 = isapprox(integrate(p5,0.0,1.0),1.0,atol=1.0e-14)
+
+    p6 = PolyExp(0,[1.0],-1.0)
+    cond2 = isapprox(integrate(p6,0.0,1.0),1.0-exp(-1.0),atol=1.0e-14)
+
+    p7 = PolyExp(1,[1.0; 0.0],-1.0)
+    cond3 = isapprox(integrate(p7,0.0,1.0),1.0-2*exp(-1.0),atol=1.0e-14)
+
+    p8 = PolyExp(2,[1.0; 0.0; 0.0],-1.0)
+    cond4 = isapprox(integrate(p8,0.0,1.0),2.0-5exp(-1),atol=1.0e-14)
+
+    p9 = PolyExp(3,[1.0; 0.0; 0.0; 0.0],-1.0)
+    cond5 = isapprox(integrate(p9,0.0,1.0),6.0-16exp(-1.0),atol=1.0e-14)
+
+    p10 = PolyExp(1,[1.0; 0.0],0.5)
+    cond6 = isapprox(integrate(p10,1.0,2.0),2exp(0.5),atol=1.0e-14)
+
+    p11 = PolyExp(2,[1.0; 0.0; 0.0],0.5)
+    cond7 = isapprox(integrate(p11,1.0,2.0),8exp(1.0)-10exp(0.5),atol=1.0e-14)
+
+    p12 = PolyExp(3,[1.0; 0.0; 0.0; 0.0],0.5)
+    cond8 = isapprox(integrate(p12,1.0,2.0),58exp(0.5)-32exp(1.0),atol=1.0e-14)
+
+    cond1 & cond2 & cond3 & cond4 & cond5 & cond6 & cond7 & cond8
+end
+
+
+function test_basis_PE()
+    N = 5
+    X = collect(LinRange(0.0,10.0,N));
+    xl = [X[1]; X[1:N-2]; X[N-1]]
+    xm = [X[1]; X[2:N-1]; X[N]]
+    xu = [X[2]; X[3:N];   X[N]]
+
+    p_increase = PolyExp(2,[-1.0; 2.0; 0.0],0.0)
+    p_decrease = PolyExp(2,[1.0; 0.0; 0.0],0.0)
+
+    p1 = [p_increase for _ in 1:N]
+    p2 = [p_decrease for _ in 1:N]
+
+    v = Array{Function,1}(undef,N)
+    [v[i] = (x::Cdouble->p1[i].c[1]*x) for i in 1:N]
+
+    BPE = basis_PE(xl,xm,xu,p1,p2,v)
+
+    cond1 = (typeof(BPE)==basis_PE)
+    cond2 = (BPE.N==N)
+    cond3 = ((N==length(BPE.xl))) & (!any(isnan.(BPE.xl))) & (!any(isinf.(BPE.xl)))
+    cond4 = ((N==length(BPE.xm))) & (!any(isnan.(BPE.xm))) & (!any(isinf.(BPE.xm)))
+    cond5 = ((N==length(BPE.xu))) & (!any(isnan.(BPE.xu))) & (!any(isinf.(BPE.xu)))
+    cond6 = (all(BPE.xl .<= BPE.xm)) & (all(BPE.xm .<= BPE.xu))
+    cond7 = (BPE.N==length(BPE.p1)) & (BPE.N==length(BPE.p2)) & (BPE.N==length(BPE.v))
+
+    # void 
+    Bvoid = basis_PE()
+    cond8 = (Bvoid.N==0)
+    cond9 = ((0==length(Bvoid.xl))) & ((0==length(Bvoid.xm))) & ((0==length(Bvoid.xu)))
+    cond10 = ((0==length(Bvoid.p1))) & ((0==length(Bvoid.p2))) & ((0==length(Bvoid.v)))
+    
+    # copy 
+    BPE_copy = basis_PE(BPE)
+    cond11 = (typeof(BPE_copy)==basis_PE)
+    cond12 = (BPE_copy.N==N)
+    cond13 = (all(BPE_copy.xl .== BPE.xl)) & (all(BPE_copy.xm .== BPE.xm)) & (all(BPE_copy.xu .== BPE.xu))
+    cond14 = (all(BPE_copy.p1 .== BPE.p1)) & (all(BPE_copy.p2 .== BPE.p2))
+    cond15 = (length(BPE_copy.v)==length(BPE.v)) # could find a better test 
+
+    # return 
+    cond1 & cond2 & cond3 & cond4 & cond5 & cond6 & cond7 & cond8 & cond9 & cond10 & cond11 & cond12 & cond13 & cond14 & cond15
+end
+
+function test_basis_PE_BC()
+    X = collect(LinRange(0.0,10.0,5));
+    p_increase = PolyExp(2,[-1.0; 2.0; 0.0],0.0)
+    p_decrease = PolyExp(2,[1.0; 0.0; 0.0],0.0)
+    ul = 1.0
+    uu = 1.0 
+    BC = BoundCond1D("Dirichlet","Dirichlet",X[1],X[end];lowBC=ul,upBC=uu)
+
+    BPE = basis_PE_BC(X,p_increase,p_decrease,BC)
+
+    cond1 = (typeof(BPE)==basis_PE)
+    cond2 = (BPE.N==length(X))
+    cond3 = ((BPE.N==length(BPE.xl))) & (!any(isnan.(BPE.xl))) & (!any(isinf.(BPE.xl)))
+    cond4 = ((BPE.N==length(BPE.xm))) & (!any(isnan.(BPE.xm))) & (!any(isinf.(BPE.xm)))
+    cond5 = ((BPE.N==length(BPE.xu))) & (!any(isnan.(BPE.xu))) & (!any(isinf.(BPE.xu)))
+    cond6 = (all(BPE.xl .<= BPE.xm)) & (all(BPE.xm .<= BPE.xu))
+    cond7 = (BPE.N==length(BPE.p1)) & (BPE.N==length(BPE.p2)) & (BPE.N==length(BPE.v))
+    
+    cond1 & cond2 & cond3 & cond4 & cond5 & cond6 & cond7
+end
+
+@testset "Exponential polynomials functions and basis" begin
+    @test test_PolyExp()
+    @test test_operator_overload()
+    @test test_deriv()
+    @test test_polynomial_deriv()
+    @test test_polynomial_primitive()
+    @test test_integrate()
+    @test test_basis_PE()
+    @test test_basis_PE_BC()
 end
