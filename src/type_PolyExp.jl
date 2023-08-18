@@ -1,3 +1,18 @@
+"""
+    PolyExp
+
+    Objsect that represents exponential-polynomials of the form \$P(X) = e^{\\alpha X}\\underset{n=0}{\\overset{N}{\\sum}}c_{N-n+1} X^n\$
+
+    An object can be created with PolyExp(nn::Int64,cc::Array{Cdouble,1},αα::Cdouble)
+
+    c = [1.0; 2.0; 3.0; 4.0]
+    \\alpha = 0.7
+    N = 3
+
+    p = PolyExp(N,c,\\alpha)
+
+    PolyExp object can be multiplied * and compare ==
+"""
 mutable struct PolyExp
     n::Int64 # polynomial order
     c::Array{Cdouble,1} # list of polynomial coefficients in decreasing degree order (n, n-1,...,0)
@@ -41,6 +56,13 @@ end
 Base.broadcast(::typeof(*), p1::PolyExp, p2::PolyExp) = *(p1,p2)
 
 # creates the polynomial P((x-x0)/(x1-x0))
+"""
+    shift_PolyExp(P::PolyExp,x0::Cdouble,x1::Cdouble;rev::Bool=false)
+
+    a function that computes the coefficient of a PolyExp when evaluated either in \$\frac{X-x_0}{x_1-x_0}\$ (rev=false) or in \$\frac{x_1-X}{x_1-x_0}\$ (rev=true)
+    
+    The returned PolyExp P_shift(X) is the same degree as the input object
+"""
 function shift_PolyExp(P::PolyExp,x0::Cdouble,x1::Cdouble;rev::Bool=false)
     if (x0==x1) 
         throw("PolyExp: shift error")
@@ -65,7 +87,12 @@ function shift_PolyExp(P::PolyExp,x0::Cdouble,x1::Cdouble;rev::Bool=false)
     PolyExp(P.n,c,α)
 end
 
+"""
+    evalPolyExp(x::Cdouble,p::PolyExp)
+    evalPolyExp(x::Array{Cdouble,1},p::PolyExp)
 
+    evaluates the PolyExp for the value x
+"""
 function evalPolyExp(x::Cdouble,p::PolyExp)
     val = 0.0
     for i in 0:p.n
@@ -73,7 +100,6 @@ function evalPolyExp(x::Cdouble,p::PolyExp)
     end
     val*exp(p.α*x)
 end
-
 function evalPolyExp(x::Array{Cdouble,1},p::PolyExp)
     val = zeros(Cdouble,length(x))
     for i in 0:p.n
@@ -84,7 +110,18 @@ function evalPolyExp(x::Array{Cdouble,1},p::PolyExp)
 end
 
 
+"""
+    PolyExpBasisFun(x::Cdouble,xmin::Cdouble,xmed::Cdouble,xmax::Cdouble,PE1::PolyExp,PE2::PolyExp)
 
+    evaluates in x the function defined as
+    ```
+    \\begin{cases}
+        PE1(X) & \\text{ if } X\\in[x_{\\min},x_{\\text{med}})\\\\
+        PE2(X) & \\text{ if } X\\in[x_{\\text{med}},x_{\\max})\\\\
+        0 & \\text{otherwise}
+    \\end{cases}
+    ```
+"""
 function PolyExpBasisFun(x::Cdouble,xmin::Cdouble,xmed::Cdouble,xmax::Cdouble,PE1::PolyExp,PE2::PolyExp)
     val = 0.0
     if ((x>=xmin) & (x<xmax))
@@ -104,6 +141,13 @@ function PolyExpBasisFun(x::Cdouble,xmin::Cdouble,xmed::Cdouble,xmax::Cdouble,PE
     val
 end
 
+
+"""
+    deriv(PE::PolyExp)
+
+    creates a PolyExp object that is the derivative of PE, \$\frac{\text{d}PE}{\text{d}X}\$
+
+"""
 function deriv(PE::PolyExp)
     # deriv the polynomial
     p_prime = [0.0; [(PE.n-i)*PE.c[i+1] for i in 0:PE.n-1]]
@@ -111,17 +155,48 @@ function deriv(PE::PolyExp)
     PolyExp(PE.n,p_prime.+PE.α*PE.c,PE.α)
 end
 
-function polynomial_primitive(PE::PolyExp)
-    p_primitive = [[PE.c[i+1]/(PE.n-i+1) for i in 0:PE.n]; 0.0]
-    PolyExp(PE.n+1,p_primitive,0.0)
-end
+"""
+    polynomial_deriv(PE::PolyExp)
 
+    creates a PolyExp object with the derivative of the PolyExp PE, i.e. the exponential coefficient is 0 and the degree of the polynomial is PE.n-1
+"""
 function polynomial_deriv(PE::PolyExp)
     # p_deriv = [[(PE.n-i)*PE.c[i+1] for i in 0:PE.n]; 0.0]
     p_deriv = [(PE.n-i)*PE.c[i+1] for i in 0:PE.n-1];
     PolyExp(PE.n-1,p_deriv,0.0)
 end
 
+"""
+    polynomial_primitive(PE::PolyExp)
+
+    creates a PolyExp object with the primitive of the PolyExp PE, i.e. the exponential coefficient is 0, the degree of the polynomial is PE.n+1, and the constant term is 0
+"""
+function polynomial_primitive(PE::PolyExp)
+    p_primitive = [[PE.c[i+1]/(PE.n-i+1) for i in 0:PE.n]; 0.0]
+    PolyExp(PE.n+1,p_primitive,0.0)
+end
+
+
+"""
+    integrate(PE::PolyExp,xmin::Cdouble,xmax::Cdouble)
+
+    compute recursively the integrale
+
+    I_n^{\\alpha}(x_{\\min},x_{\\max}) = \$\\int_{x_{\\min}}^{x_{\\max}} e^{\\alpha x} \\underset{n=0}{\\overset{N}{\\sum}} c_{N-n+1} X^n \\text{d}x\$
+
+    if \\alpha \\neq 0, then 
+        I_n^{\\alpha}(x_{\\min},x_{\\max}) = \\frac{1}{\\alpha} \\left(R_{n}^{\\alpha}(x_{\\min},x_{\\max}) - I_{n-1}^{\\alpha}(x_{\\min},x_{\\max})\\right)
+        I_0^{\\alpha}(x_{\\min},x_{\\max}) = \\frac{R_{0}^{\\alpha}(x_{\\min},x_{\\max})}{\\alpha}
+
+        with R_{n}^{\\alpha}(x_{\\min},x_{\\max}) = [\\frac{\\text{d}^{(N-n)} Poly(PE)}{\\text{d} x}(x) e^{\\alpha x}]_{x_{\\min}}^{x_{\\max}} 
+        where Poly(PE) is the polynomial part of the PolyExp object, and by convention, the zero-th order derivative is the function
+
+    if \\alpha=0, then
+
+        I_n^{\\alpha}(x_{\\min},x_{\\max}) = R_{n}^{\\alpha}(x_{\\min},x_{\\max}) (as defined above)
+
+
+"""
 function integrate(PE::PolyExp,xmin::Cdouble,xmax::Cdouble)
     val = 0.0
     if (isapprox(exp(PE.α*xmin),exp(PE.α*xmax),atol=1.0e-15)) # polynomial integration     # the condition (PE.α==0.0) is replaced with isapprox(exp(PE.α*xmin),exp(PE.α*xmax),atol=1.0e-15)
@@ -181,6 +256,20 @@ function basis_PE_l(x0::Cdouble,x1::Cdouble,p1::PolyExp)
 end
 
 # object with all the attibutes to describe a basis of a function space 
+"""
+    basis_PE
+
+    a structure that represents basis functions with `PolyExp` objects 
+
+      - N: number of basis functions
+      - xl, xm and xu: arrays containing the lower, intermediate, and upper end of the support of the functions (each of these array have N elements)
+      - p1 and p2: arrays with N PolyExp object representing the basis functions over the respective intervals [xl,xm] and [xm,xu]
+      - v: array of N basis functions 
+
+    A basis_PE object should be created with the function
+
+    basis_PE(xl::Array{Cdouble,1},xm::Array{Cdouble,1},xu::Array{Cdouble,1},p1::Array{PolyExp,1},p2::Array{PolyExp,1},v::Array{Function,1})
+"""
 mutable struct basis_PE # more abstract representation of the basis for polynomial-exponential functions
 
     # the functions
@@ -274,6 +363,16 @@ function DBC_non_homogeneous_bounds_basis_PE(X::Array{Cdouble,1},p1::PolyExp,p2:
 end
 
 # get inspired from other functions to create the basis
+"""
+    basis_PE_BC(X::Array{Cdouble,1},p1::PolyExp,p2::PolyExp,BC::BoundCond1D)
+
+    generates a `basis_PE` object from
+
+      - X:         array with N discretization nodes 
+      - p1 and p2: generator PolyObjects (p1 for the first part of the interval of the basis function and p2 for the second) These PolyExp objects are shifted along the discretization nodes
+      - BC:        boundary conditions. According to the type of bnoundary conditions, the basis can have N, N-1 or N-2 basis function
+
+"""
 function basis_PE_BC(X::Array{Cdouble,1},p1::PolyExp,p2::PolyExp,BC::BoundCond1D)
     # X is the discretized 1D space
     # BCu is the type of boundary condition applied at X[end], it can take the values Dirichlet, Neumann or Robin
@@ -299,7 +398,11 @@ function basis_PE_BC(X::Array{Cdouble,1},p1::PolyExp,p2::PolyExp,BC::BoundCond1D
 end
 
 
+"""
+    deriv(BPE::basis_PE)
 
+    returns a new `basis_PE` object with the derivatives of each function in BPE 
+"""
 function deriv(BPE::basis_PE)
     # derive exponential-polynomials
     p1_deriv = [deriv(BPE.p1[i]) for i in 1:BPE.N]

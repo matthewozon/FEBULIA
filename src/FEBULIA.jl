@@ -17,6 +17,25 @@
 #
 #------------------------------------------------------------------------------
 
+"""
+This is the [`FEBULIA`](@ref), it contains 
+* [`FEBULIA.BoundCond1D`](@ref)
+* [`FEBULIA.riemann`](@ref)
+* [`FEBULIA.dotf`](@ref)
+* [`FEBULIA.compute_norm`](@ref)
+* [`FEBULIA.coefficient`](@ref)
+* [`FEBULIA.PolyExp`](@ref)
+* [`FEBULIA.shift_PolyExp`](@ref)
+* [`FEBULIA.evalPolyExp`](@ref)
+* [`FEBULIA.PolyExpBasisFun`](@ref)
+* [`FEBULIA.deriv`](@ref)
+* [`FEBULIA.polynomial_primitive`](@ref)
+* [`FEBULIA.polynomial_deriv`](@ref)
+* [`FEBULIA.integrate`](@ref)
+* [`FEBULIA.basis_PE_BC`](@ref)
+* [`FEBULIA.basis_PE`](@ref)
+* [`FEBULIA.basis`](@ref)
+"""
 module FEBULIA
 
 using Printf

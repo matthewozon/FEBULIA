@@ -18,6 +18,21 @@
 # - N: the number of basis vectors
 # - x: the support ranges of the basis functions
 # - v: the basis functions
+"""
+    basis
+
+    WARNING: soon deprecated
+
+    a structure that contains basis functions 
+
+      - N: number of basis functions
+      - X: 2D array containing the lower and upper end of the support of the functions (dim=1: basis function index, dim=2: lower and upper interval ends)
+      - v: array of N basis functions 
+
+    A basis_PE object should be created with the function
+
+    basis_PE(xl::Array{Cdouble,1},xm::Array{Cdouble,1},xu::Array{Cdouble,1},p1::Array{PolyExp,1},p2::Array{PolyExp,1},v::Array{Function,1})
+"""
 mutable struct basis
 
     # the functions
@@ -44,10 +59,21 @@ end
 
 
 
-# this type contains all the necessary information related to the boundary conditions of a FE problem in 1D
-# - x: where are the boundaries
-# - g: a function that gives the values at the boundaries, it may vary with an external parameter which is why it is a function, not Cdoubles
-# - BC_type: the type of boundary conditions at each boundary
+"""
+    BoundCond1D 
+
+    This type contains all the necessary information related to the boundary conditions of a FE problem in 1D
+
+     - BCl and BCu: strings describing the boundary conditions (valid type in {"Dirichlet", "Neumann", "Robin"})
+     - xl and xu: are the boundaries (xl: low, xu: up)
+     - ul and uu: values of the boundary conditions
+     - g: a function that gives the values at the boundaries, it may vary with an external parameter which is why it is a function
+     - a and b: describe the Robin conditions (\$a u(x) + b \\frac{\\partial u}{\\partial x}(x) = g(x)\$)
+
+     An object is constructed with the function
+        
+        BoundCond1D(BCl::String,BCu::String,xl::Cdouble,xu::Cdouble;lowBC::Cdouble=0.0,upBC::Cdouble=0.0,Ra::Cdouble=0.0,Rb::Cdouble=0.0,Rg::Function=(y::Cdouble->0.0))
+"""
 mutable struct BoundCond1D
     # Boundary Conditions types
     BCl::String     # the type of boundary condition at the lower end (may be in {Dirichlet, Neumann, Robin})
