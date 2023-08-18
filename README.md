@@ -38,6 +38,19 @@ Let $B_{\text{decomp}} = (e_n)_{1\leqslant n\leqslant N}$ be the decomposition b
 u_{\text{proj}}(x,t) = \underset{n=1}{\overset{N}{\sum}} u_n(t)e_n(x),\quad D_{\text{proj}}(x) = \underset{n=1}{\overset{N}{\sum}} d_n e_n(x),\quad \text{and}\quad f_{\text{proj}}(x,t) = \underset{n=1}{\overset{N}{\sum}} f_n(t)e_n(x)
 ```
 
- 
+Using this decomposition with the weak form leads to a system of ordinary differential equations (ODEs) that we write in the matrix form:
+
+```math
+M\frac{\text{d}u}{\text{d}t} = \begin{bmatrix}D^t L^{(1)}\\D^t L^{(2)}\\ \vdots \\ D^t L^{(N)}\end{bmatrix} u + Mf = S(D) u + Mf
+```
+where $u = [u_1(t)\,u_2(t) \ldots u_N(t)]$, $D = [d_1\,d_2 \ldots d_N]$ and $f = [f_1(t)\,f_2(t) \ldots f_N(t)]$.
+The FEM matrices $M$ (mass) and $(L^{(j)})_{1\leqslant j \leqslant N}$ (stiffness) have entries defined by
+```math
+\begin{align}
+ M_{j,n} &= \int_{x_{\text{min}}}^{x_{\text{max}}} e_n(x)\varphi_j(x)\text{d}x,\\
+ L_{m,n}^j &= \int_{x_{\text{min}}}^{x_{\text{max}}} \frac{\text{d}}{\text{d}x}\left(e_m(x)\frac{\text{d}e_n}{\text{d}x}\right)\varphi_j(x)\text{d}x = \left[ e_m(x)\frac{\text{d}e_n}{\text{d}x}(x)\varphi_j(x) \right]_{x_{\text{min}}}^{x_{\text{max}}} - \int_{x_{\text{min}}}^{x_{\text{max}}} e_m(x)\frac{\text{d}e_n}{\text{d}x} \frac{\text{d}\varphi_j}{\text{d}x}(x)\text{d}x
+\end{align}
+```
+
 
 ![diffusion_1D](https://github.com/matthewozon/FEBULIA/assets/7929598/48c84da8-68d8-4c70-a94d-bde1543d5d3d)
