@@ -1,13 +1,8 @@
 [![FEBULIA CI](https://github.com/matthewozon/FEBULIA/actions/workflows/CI.yml/badge.svg)](https://github.com/matthewozon/FEBULIA/actions/workflows/CI.yml)
 [![Documentation](https://github.com/matthewozon/FEBULIA/actions/workflows/documentation.yml/badge.svg)](https://github.com/matthewozon/FEBULIA/actions/workflows/documentation.yml)
 
-# FEBULIA
-Basis functions and some tools for FEM
-coming soon: a proper readme file. But for now, here is an example of possible basis sets
 
-
-# Example
-## exponential polynomials
+# Exponential polynomials
 Not unlike ![Polynomials.jl](https://github.com/JuliaMath/Polynomials.jl), we represent exponential-polynomial functions in an abstract way. 
 
 For instance, the function $X\longrightarrow e^{\frac{X}{2}}(X^4 + 2X^2 + 3)$ is represented with the object `PolyExp`, and it is instanced with
@@ -46,7 +41,7 @@ axP.annotate("\$P_1(X) = e^{\\frac{X}{2}}\\left(X^4+2X^2+3\\right)\$", xy=(3, 1)
 
 
 
-## Basis function generation
+# Basis function generation
 
 Basis function can be created from `PolyExp` objects. For instance, a piecewise linear basis can be generated with `basis_PE_BC` from the code
 
@@ -82,7 +77,7 @@ The following figure show an example of basis functions and their derivatives in
 ![example_PE_basis](https://github.com/matthewozon/FEBULIA/assets/7929598/c7fa4bf1-16f4-44ef-b9ea-6ee3aeaf6857)
 
 
-## Diffusion
+# Example for FEM: Diffusion equation
 Suppose that you want to solve a diffusion equation for the quantity $u(x,t)$ using FEM. For instance, the equation can be:
 
 ```math
