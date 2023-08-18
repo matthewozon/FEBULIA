@@ -1,4 +1,5 @@
 [![FEBULIA CI](https://github.com/matthewozon/FEBULIA/actions/workflows/CI.yml/badge.svg)](https://github.com/matthewozon/FEBULIA/actions/workflows/CI.yml)
+[![Documentation](https://github.com/matthewozon/FEBULIA/actions/workflows/documentation.yml/badge.svg)](https://github.com/matthewozon/FEBULIA/actions/workflows/documentation.yml)
 
 # FEBULIA
 Basis functions and some tools for FEM
