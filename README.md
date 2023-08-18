@@ -51,6 +51,18 @@ The FEM matrices $M$ (mass) and $(L^{(j)})_{1\leqslant j \leqslant N}$ (stiffnes
  L_{m,n}^j &= \int_{x_{\text{min}}}^{x_{\text{max}}} \frac{\text{d}}{\text{d}x}\left(e_m(x)\frac{\text{d}e_n}{\text{d}x}\right)\varphi_j(x)\text{d}x = \left[ e_m(x)\frac{\text{d}e_n}{\text{d}x}(x)\varphi_j(x) \right]_{x_{\text{min}}}^{x_{\text{max}}} - \int_{x_{\text{min}}}^{x_{\text{max}}} e_m(x)\frac{\text{d}e_n}{\text{d}x} \frac{\text{d}\varphi_j}{\text{d}x}(x)\text{d}x
 \end{align}
 ```
+For the sake of simplicity, in the following, we choose a test function basis $B_{\text{test}}$ with the same number of function as the decomposition basis $B_{\text{decomp}}$. This means that $M$ and $S(D)$ are square matrices. 
+From here, the system of ODE can be solved using an explicit Euler integration scheme (not the best choice, but it works well enough for this example)
+```math
+\begin{cases}
+u(0) = u_0\\
+u(t+\Delta t) = u(t) + \Delta t \left(M^{-1}S(D)u(t) + f(t)\right) = \left(I + \Delta t M^{-1}S(D)\right) u(t) + f(t)
+\end{cases}
+```
+Note that for this scheme to not diverge, the time step $\Delta t$ must meet the condition $\Delta < \underset{n\in[[1,N]]}{\max}\left\lbrace-2\frac{\mathcal{Re}(\lambda_n)}{|\lambda_n|^2}\right\rbrace$, where $(\lambda_n)_{1\leqslant n \leqslant N}$ is the set of eigen values of the stiffness matrix $S(D)$.
 
+note on how the boundary conditions are handled
+
+generator exponential-polynomials for the decomposition basis $p_1(X) = p_2(X) = X$, and test function $p_1(X) = -X^2 +2X$ and $p_2(X) = X^2$
 
 ![diffusion_1D](https://github.com/matthewozon/FEBULIA/assets/7929598/48c84da8-68d8-4c70-a94d-bde1543d5d3d)
