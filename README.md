@@ -142,8 +142,8 @@ Note that for this scheme to not diverge, the time step $\Delta t$ must meet the
 For the numerical resolution of the diffusion equation, the following `FEBULIA` tools will be used:
 
   - `BoundCond1D`: boundary condition object with Neumann boundary conditions at each end of the interval
-  - `basis_PE`: basis with linear and quadratic functions
-  - `PolyExp`: exponential-polynomial representation of the generator of the basis functions
+  - `basis_PE`: basis with linear and quadratic functions 
+  - `PolyExp`: exponential-polynomial representation of the generator of the basis functions (generator exponential-polynomials for the decomposition basis $p_1(X) = p_2(X) = X$, and test function $p_1(X) = -X^2 +2X$ and $p_2(X) = X^2$)
   - `integrate`: for computing the matrix elements (it is an exact integration that relies on the exponential-polynomial representation, not a numerical integration)
 
 
@@ -191,6 +191,9 @@ function qk_PE(j::Int64,l::Int64,k::Int64,E::basis_PE,B1::basis_PE,B2::basis_PE)
     val
 end
 ```
-generator exponential-polynomials for the decomposition basis $p_1(X) = p_2(X) = X$, and test function $p_1(X) = -X^2 +2X$ and $p_2(X) = X^2$
+
+Finally, the following figure is generated with [diffusion_1D.jl](test/diffusion_1D.jl).
 
 ![diffusion_1D](https://github.com/matthewozon/FEBULIA/assets/7929598/48c84da8-68d8-4c70-a94d-bde1543d5d3d)
+
+The diffusing quantity $u$ is plot in panel a) as a contour plot with time on the abscissa and $x$ on the ordinate. The color code for the intensity of $u$. The source term for $t>30 [\min]$ is plotted in panl b).
