@@ -126,6 +126,9 @@ The FEM matrices $M$ (mass) and $(L^{(j)})_{1\leqslant j \leqslant N}$ (stiffnes
  L_{m,n}^j &= \int_{x_{\text{min}}}^{x_{\text{max}}} \frac{\text{d}}{\text{d}x}\left(e_m(x)\frac{\text{d}e_n}{\text{d}x}\right)\varphi_j(x)\text{d}x = \left[ e_m(x)\frac{\text{d}e_n}{\text{d}x}(x)\varphi_j(x) \right]_{x_{\text{min}}}^{x_{\text{max}}} - \int_{x_{\text{min}}}^{x_{\text{max}}} e_m(x)\frac{\text{d}e_n}{\text{d}x} \frac{\text{d}\varphi_j}{\text{d}x}(x)\text{d}x
 \end{align}
 ```
+From this formulation it is possible to deal with the boundary conditions. The problem is set with homogeneous Neumann boundary conditions, i.e. $\frac{\partial u}{\partial x}(x_{\min})=0$ and $\frac{\partial u}{\partial x}(x_{\max})=0$.
+In the formulation of the matrix element, derivatives appear. The derivative of the $n^{\text{th}}$ function of the diffusing quatity $u$ is evaluated in $x_{\min}$ and $x_{\max}$, hence, with a proper choice of decomposition and test basis, the matrix element $L_{1,1}^1$ will be used for the lower boundary condition, and $L_{N,N}^N$ for the upper one.
+
 For the sake of simplicity, in the following, we choose a test function basis $B_{\text{test}}$ with the same number of function as the decomposition basis $B_{\text{decomp}}$. This means that $M$ and $S(D)$ are square matrices. 
 From here, the system of ODE can be solved using an explicit Euler integration scheme (not the best choice, but it works well enough for this example)
 ```math
