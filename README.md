@@ -146,6 +146,51 @@ For the numerical resolution of the diffusion equation, the following `FEBULIA` 
   - `PolyExp`: exponential-polynomial representation of the generator of the basis functions
   - `integrate`: for computing the matrix elements (it is an exact integration that relies on the exponential-polynomial representation, not a numerical integration)
 
+
+The matrix elements are computed with the functions `mj_PE` and `qk_PE` using `integrate`
+```
+function mj_PE(j::Int64,i::Int64,E::basis_PE,B::basis_PE)
+    val = 0.0
+    # E[j] # test
+    # B[i] # decomposition
+    if (i==j)
+        val = integrate(B.p1[i]*E.p1[j],B.xl[i],B.xm[i]) + integrate(B.p2[i]*E.p2[j],B.xm[i],B.xu[i]);
+    elseif ((i+1)==j) # e.g. j=5 and i=4
+        val = integrate(B.p2[i]*E.p1[j],B.xm[i],B.xu[i])
+    elseif ((i-1)==j)
+        val = integrate(B.p1[i]*E.p2[j],B.xl[i],B.xm[i])
+    else
+        val = 0.0
+    end
+    val
+end
+
+function qk_PE(j::Int64,l::Int64,k::Int64,E::basis_PE,B1::basis_PE,B2::basis_PE) # projection line, line, column, projection basis, decomposition basis 1, decomposition basis 2
+    val = 0.0
+    if ((l==j) & (k==j))
+        val = integrate(B1.p1[l]*B2.p1[k]*E.p1[j],E.xl[j],E.xm[j]) + integrate(B1.p2[l]*B2.p2[k]*E.p2[j],E.xm[j],E.xu[j])
+    elseif ((l==j) & (k==(j+1)))
+        val = integrate(B1.p2[l]*B2.p1[k]*E.p2[j],E.xm[j],E.xu[j])
+    elseif ((l==j) & (k==(j-1)))
+        val = integrate(B1.p1[l]*B2.p2[k]*E.p1[j],E.xl[j],E.xm[j])
+    elseif ((l==(j+1)) & (k==j))
+        val = integrate(B1.p1[l]*B2.p2[k]*E.p2[j],E.xm[j],E.xu[j])
+    elseif ((l==(j-1)) & (k==j))
+        val = integrate(B1.p2[l]*B2.p1[k]*E.p1[j],E.xl[j],E.xm[j])
+    elseif ((l==(j+1)) & (k==(j+1)))
+        val = integrate(B1.p1[l]*B2.p1[k]*E.p2[j],E.xm[j],E.xu[j])
+    elseif ((l==(j+1)) & (k==(j-1)))
+        val = 0.0
+    elseif ((l==(j-1)) & (k==(j+1)))
+        val = 0.0
+    elseif ((l==(j-1)) & (k==(j-1)))
+        val = integrate(B1.p2[l]*B2.p2[k]*E.p1[j],E.xl[j],E.xm[j]) 
+    else
+        val = 0.0
+    end
+    val
+end
+```
 generator exponential-polynomials for the decomposition basis $p_1(X) = p_2(X) = X$, and test function $p_1(X) = -X^2 +2X$ and $p_2(X) = X^2$
 
 ![diffusion_1D](https://github.com/matthewozon/FEBULIA/assets/7929598/48c84da8-68d8-4c70-a94d-bde1543d5d3d)
