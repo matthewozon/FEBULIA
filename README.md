@@ -139,7 +139,12 @@ u(t+\Delta t) = u(t) + \Delta t \left(M^{-1}S(D)u(t) + f(t)\right) = \left(I + \
 ```
 Note that for this scheme to not diverge, the time step $\Delta t$ must meet the condition $\Delta < \underset{n\in[[1,N]]}{\max}\left\lbrace-2\frac{\mathcal{Re}(\lambda_n)}{|\lambda_n|^2}\right\rbrace$, where $(\lambda_n)_{1\leqslant n \leqslant N}$ is the set of eigen values of the stiffness matrix $S(D)$.
 
-note on how the boundary conditions are handled
+For the numerical resolution of the diffusion equation, the following `FEBULIA` tools will be used:
+
+  - `BoundCond1D`: boundary condition object with Neumann boundary conditions at each end of the interval
+  - `basis_PE`: basis with linear and quadratic functions
+  - `PolyExp`: exponential-polynomial representation of the generator of the basis functions
+  - `integrate`: for computing the matrix elements (it is an exact integration that relies on the exponential-polynomial representation, not a numerical integration)
 
 generator exponential-polynomials for the decomposition basis $p_1(X) = p_2(X) = X$, and test function $p_1(X) = -X^2 +2X$ and $p_2(X) = X^2$
 
