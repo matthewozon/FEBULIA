@@ -9,13 +9,14 @@ coming soon: a proper readme file. But for now, here is an example of possible b
 ## exponential polynomials
 Not unlike ![Polynomials.jl](https://github.com/JuliaMath/Polynomials.jl), we represent exponential-polynomial functions in an abstract way. 
 
-For instance, the function $X\longrightarrow e^{0.5 X}(X^4 + 2X^2 + 3)$ is represented with the object `PolyExp`, and it is instanced with
+For instance, the function $X\longrightarrow e^{\frac{X}{2}}(X^4 + 2X^2 + 3)$ is represented with the object `PolyExp`, and it is instanced with
 
 ```
-p1 = PolyExp(4,[1.0; 0.0; 2.0; 0.0; 3.0],0.5)
+p1 = PolyExp(4,[1.0; 0.0; 2.0; 0.0; 3.0],1/2)
 ```
 
 The argument of `PolyExp` are 1) the order of the polynomial, 2) a vector of coefficient in decreasing degree order, and 3) the exponential coefficient.
+Two `PolyExp` object can be multiplied `*(::PolyExp,::PolyExp)` and compared `==(::PolyExp,::PolyExp)`.
 
 The exponential-polynomial can be evaluated with `evalPolyExp`. The following code plots `p1` in the interval $[-40,2.5]$
 
@@ -25,10 +26,10 @@ rc("text", usetex=true)
 using FEBULIA
 
 p1 = PolyExp(4,[1.0; 0.0; 2.0; 0.0; 3.0],0.5)
-
+Xplot = collect(-40.0:0.01:2.5)
 figure(); 
 axP = subplot(111)
-plot(collect(-40.0:0.01:2.5),evalPolyExp(collect(-40.0:0.01:2.5),p1))
+plot(Xplot,evalPolyExp(Xplot,p1))
 xlabel("\$X\$",fontsize=12)
 ylabel("\$P(X)\$",fontsize=12)
 xlim(-41,3)
@@ -45,8 +46,41 @@ axP.annotate("\$P_1(X) = e^{\\frac{X}{2}}\\left(X^4+2X^2+3\\right)\$", xy=(3, 1)
 
 
 ## Basis function generation
-$p_1(X) = -X^2 +2X$ and $p_2(X) = X^2$
+
+Basis function can be created from `PolyExp` objects. For instance, a piecewise linear basis can be generated with `basis_PE_BC` from the code
+
+```
+# discretization nodes
+x0         = 0.0
+xend       = 1.0π
+Ndisc      = 200
+X_nodes    = collect(LinRange(x0,xend,Ndisc))
+# polynomials
+p1_lin     = PolyExp(1,[1.0; 0.0],0.0)
+p2_lin     = PolyExp(1,[1.0; 0.0],0.0)
+# boundary conditions
+ul = 1.0
+uu = 1.0
+BC = BoundCond1D("Dirichlet","Dirichlet",X_nodes[1],X_nodes[end];lowBC=ul,upBC=uu)
+# basis function
+B_decomp   = basis_PE_BC(X_nodes,p1_lin,p2_lin,BC)
+```
+
+The generation of the basis function requires two `PolyExp` object, one for the first part of the inteval \$[x_{j-1},x_j)\$ and the other for the second interval \$[x_j,x_{j+1})\$. For each interval where the \$j^{\text{th}}\$ function is defined, the generator `PolyExp` objects are shifted and the local \$j^{\text{th}}\$ `PolyExp` is given by \$P_j(X)=P(\frac{X-x_{j-1}}{x_{j}-x_{j-1}})\$ over \$[x_{j-1},x_j)\$ and \$P_j(X)=P(\frac{x_{j+1}-X}{x_{j+1}-x_{j}})\$ over \$[x_j,x_{j+1})\$.
+The shifts are computed with `shift_PolyExp`. 
+
+The derivative of the functions may be symbolically computed with `deriv`
+
+```
+B_decomp_d = deriv(B_decomp)
+```
+and produce the exact derivatives using the corresponding `PolyExp` objects.
+
+The following figure show an example of basis functions and their derivatives in the linear and quadratic cases. The generative polynomial for the quadratic basis functions are $p_1(X) = -X^2 +2X$ and $p_2(X) = X^2$.
+
 ![example_PE_basis](https://github.com/matthewozon/FEBULIA/assets/7929598/c7fa4bf1-16f4-44ef-b9ea-6ee3aeaf6857)
+
+
 ## Diffusion
 Suppose that you want to solve a diffusion equation for the quantity $u(x,t)$ using FEM. For instance, the equation can be:
 
