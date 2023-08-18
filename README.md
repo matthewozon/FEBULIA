@@ -3,9 +3,50 @@
 # FEBULIA
 Basis functions and some tools for FEM
 coming soon: a proper readme file. But for now, here is an example of possible basis sets
-![example_PE_basis](https://github.com/matthewozon/FEBULIA/assets/7929598/c7fa4bf1-16f4-44ef-b9ea-6ee3aeaf6857)
+
 
 # Example
+## exponential polynomials
+Not unlike ![Polynomials.jl](https://github.com/JuliaMath/Polynomials.jl), we represent exponential-polynomial functions in an abstract way. 
+
+For instance, the function $X\longrightarrow e^{0.5 X}(X^4 + 2X^2 + 3)$ is represented with the object `PolyExp`, and it is instanced with
+
+```
+p1 = PolyExp(4,[1.0; 0.0; 2.0; 0.0; 3.0],0.5)
+```
+
+The argument of `PolyExp` are 1) the order of the polynomial, 2) a vector of coefficient in decreasing degree order, and 3) the exponential coefficient.
+
+The exponential-polynomial can be evaluated with `evalPolyExp`. The following code plots `p1` in the interval $[-40,2.5]$
+
+```
+using PyPlot
+rc("text", usetex=true)
+using FEBULIA
+
+p1 = PolyExp(4,[1.0; 0.0; 2.0; 0.0; 3.0],0.5)
+
+figure(); 
+axP = subplot(111)
+plot(collect(-40.0:0.01:2.5),evalPolyExp(collect(-40.0:0.01:2.5),p1))
+xlabel("\$X\$",fontsize=12)
+ylabel("\$P(X)\$",fontsize=12)
+xlim(-41,3)
+ylim(-1,192)
+xticks(fontsize=12)
+yticks(fontsize=12)
+tight_layout(pad=0.5, w_pad=0.5, h_pad=0.5)
+axP.annotate("\$P_1(X) = e^{\\frac{X}{2}}\\left(X^4+2X^2+3\\right)\$", xy=(3, 1),  xycoords="axes fraction", xytext=(0.2, 0.7), textcoords="axes fraction", color="black",fontsize=14)
+```
+
+
+![ExpPoly_example](https://github.com/matthewozon/FEBULIA/assets/7929598/a0af8bb6-8511-4e91-a69c-ed61ea3ba2f6)
+
+
+
+## Basis function generation
+$p_1(X) = -X^2 +2X$ and $p_2(X) = X^2$
+![example_PE_basis](https://github.com/matthewozon/FEBULIA/assets/7929598/c7fa4bf1-16f4-44ef-b9ea-6ee3aeaf6857)
 ## Diffusion
 Suppose that you want to solve a diffusion equation for the quantity $u(x,t)$ using FEM. For instance, the equation can be:
 
