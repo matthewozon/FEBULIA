@@ -193,3 +193,9 @@ Finally, the following figure is generated with [diffusion_1D.jl](test/diffusion
 ![diffusion_1D](https://github.com/matthewozon/FEBULIA/assets/7929598/48c84da8-68d8-4c70-a94d-bde1543d5d3d)
 
 The diffusing quantity $u$ is plot in panel a) as a contour plot with time on the abscissa and $x$ on the ordinate. The color code for the intensity of $u$. The source term for $t>30 [\min]$ is plotted in panl b).
+
+# Install 
+
+```
+] add https://github.com/matthewozon/FEBULIA
+```
