@@ -1,15 +1,15 @@
 """
     PolyExp
 
-    Objsect that represents exponential-polynomials of the form \$P(X) = e^{\\alpha X}\\underset{n=0}{\\overset{N}{\\sum}}c_{N-n+1} X^n\$
+    Object that represents exponential-polynomials of the form ``P(X) = e^{\\alpha X}\\underset{n=0}{\\overset{N}{\\sum}} c_{N-n+1} X^n``
 
-    An object can be created with PolyExp(nn::Int64,cc::Array{Cdouble,1},αα::Cdouble)
+    An object can be created with PolyExp(nn::Int64,cc::Array{Cdouble,1},``\\alpha``::Cdouble)
 
-    c = [1.0; 2.0; 3.0; 4.0]
-    \\alpha = 0.7
+    ``c = [1.0; 2.0; 3.0; 4.0]``
+    ``\\alpha = 0.7``
     N = 3
 
-    p = PolyExp(N,c,\\alpha)
+    p = PolyExp(N,c,``\\alpha``)
 
     PolyExp object can be multiplied * and compare ==
 """
