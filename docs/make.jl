@@ -13,7 +13,7 @@ makedocs(
     doctest = true,
 )
 
-deploydocs(repo = "github.com/matthewozon/FEBULIA.jl.git",branch = "main") #, deploy_config=deploy_config_github)
+deploydocs(repo = "github.com/matthewozon/FEBULIA.git",branch = "main") #, deploy_config=deploy_config_github) "github.com/matthewozon/FEBULIA.jl.git"
 
 
 
