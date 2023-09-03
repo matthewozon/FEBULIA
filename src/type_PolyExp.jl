@@ -414,3 +414,18 @@ function deriv(BPE::basis_PE)
     # pack everything in a new basis 
     basis_PE(BPE.xl,BPE.xm,BPE.xu,p1_deriv,p2_deriv,v_deriv)
 end
+
+
+"""
+    coefficient(B::basis_PE,f::Function)
+
+    computes the coefficients of the projection of the function f onto the basis function of B 
+        c_i = (2/(Δx)) * ∫ f(x)*B.v[i](x) dx
+"""
+function coefficient(B::basis_PE,f::Function)
+    CF = Array{Cdouble,1}(undef,B.N)
+    for i in 1:B.N
+        CF[i] = (2.0/(B.xu[i]-B.xl[i]))*dotf(B.v[i],f,B.xl[i],B.xu[i]) #TODO: use integrate instead of dotf 
+    end
+    CF
+end

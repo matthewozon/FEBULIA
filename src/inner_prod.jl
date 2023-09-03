@@ -122,13 +122,7 @@ function coefficient(B::basis,f::Function)
     end
     CF
 end
-function coefficient(B::basis_PE,f::Function)
-    CF = Array{Cdouble,1}(undef,B.N)
-    for i in 1:B.N
-        CF[i] = (2.0/(B.xu[i]-B.xl[i]))*dotf(B.v[i],f,B.xl[i],B.xu[i]) #TODO: use integrate instead of dotf 
-    end
-    CF
-end
+
 
 
 # norm of a function
